@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký - BluePhone</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root{--primary:#1a73e8;--white:#fff;--border:#e0e0e0;--bg-light:#f8f9fa;--secondary:#34a853}
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        body{background:var(--bg-light);display:flex;align-items:center;justify-content:center;min-height:100vh}
+        .reg-box{background:var(--white);padding:40px;border-radius:8px;box-shadow:0 5px 20px rgba(0,0,0,.1);width:100%;max-width:400px}
+        .logo{text-align:center;margin-bottom:30px;font-size:28px;font-weight:bold;color:var(--primary)}
+        .logo span{color:var(--secondary)}
+        h2{text-align:center;margin-bottom:20px;color:var(--primary)}
+        .form-group{margin-bottom:20px}
+        label{display:block;margin-bottom:8px;font-weight:500}
+        input{width:100%;padding:12px 15px;border:1px solid var(--border);border-radius:4px;font-size:14px}
+        input:focus{border-color:var(--primary);outline:none}
+        button{width:100%;padding:12px;background:var(--secondary);color:var(--white);border:none;border-radius:4px;font-size:16px;cursor:pointer}
+        button:hover{background:#2e8b57}
+        .links{text-align:center;margin-top:20px}
+        .links a{color:var(--primary);text-decoration:none}
+        .links a:hover{text-decoration:underline}
+    </style>
+</head>
+<body>
+    <div class="reg-box">
+        <div class="logo">Blue<span>Phone</span></div>
+        <h2>Đăng ký tài khoản</h2>
+        <form id="reg-form">
+            <div class="form-group">
+                <label>Tên tài khoản</label>
+                <input type="text" id="username" required minlength="1">
+            </div>
+            <div class="form-group">
+                <label>Mật khẩu</label>
+                <input type="password" id="password" required minlength="1">
+            </div>
+            <button type="submit">Đăng ký</button>
+        </form>
+        <div class="links">
+            <a href="login.html">Đã có tài khoản? Đăng nhập</a><br><br>
+            <a href="index.html">Quay lại trang chủ</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('reg-form').addEventListener('submit', e => {
+            e.preventDefault();
+            const u = document.getElementById('username').value.trim();
+            const p = document.getElementById('password').value;
+            if (!u || !p) return alert('Nhập đủ thông tin!');
+
+            const users = JSON.parse(localStorage.getItem('users') || '[]');
+            if (users.find(x => x.username === u)) return alert('Tài khoản đã tồn tại!');
+
+            users.push({ username: u, password: p });
+            localStorage.setItem('users', JSON.stringify(users));
+            sessionStorage.setItem('currentUser', JSON.stringify({ username: u })); // DÙNG sessionStorage
+            alert('Đăng ký thành công!');
+            window.location.href = 'index.html';
+        });
+    </script>
+</body>
+</html>

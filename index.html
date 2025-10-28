@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BluePhone - Điện thoại chính hãng giá tốt</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        :root{
+            --primary:#1a73e8;--primary-dark:#0d47a1;--secondary:#34a853;--accent:#ff6d00;
+            --text:#fff;--bg-light:#f8f9fa;--border:#e0e0e0;--white:#fff;--footer-bg:#1a2b3c;
+        }
+        body{color:#333;background:var(--bg-light);line-height:1.6}
+        .container{max-width:1200px;margin:0 auto;padding:0 15px}
+
+        /* TOP HEADER - GIỐNG HÌNH 2 */
+        .top-header{
+            background:var(--primary);
+            color:var(--text);
+            padding:10px 0;
+            font-size:14px;
+            font-weight:600;
+            letter-spacing:0.3px;
+        }
+        .top-header .container{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            flex-wrap:wrap;
+        }
+        .top-header-links{
+            display:flex;
+            gap:22px;
+            flex-wrap:wrap;
+            align-items:center;
+        }
+        .top-header-links a{
+            color:var(--text);
+            text-decoration:none !important;
+            transition:color .2s;
+            white-space:nowrap;
+        }
+        .top-header-links a:hover{color:#b3d9ff}
+
+        /* MAIN HEADER */
+        .main-header{background:var(--white);box-shadow:0 2px 10px rgba(0,0,0,.1);position:sticky;top:0;z-index:1000}
+        .main-header .container{display:flex;align-items:center;padding:15px 0}
+        .logo{font-size:28px;font-weight:bold;color:var(--primary);margin-right:30px}
+        .logo span{color:var(--secondary)}
+        .search-box{flex:1;max-width:600px;display:flex;margin-right:20px}
+        .search-box input{flex:1;padding:12px 15px;border:1px solid var(--border);border-radius:4px 0 0 4px;font-size:14px}
+        .search-box button{background:var(--primary);color:var(--white);padding:0 20px;border-radius:0 4px 4px 0}
+        .header-actions{display:flex;gap:20px;align-items:center}
+        .header-action-item{display:flex;flex-direction:column;align-items:center;font-size:12px;cursor:pointer}
+        .header-action-item i{font-size:20px;margin-bottom:5px}
+        .cart-icon{position:relative}
+        .cart-count{position:absolute;top:-5px;right:-5px;background:var(--accent);color:var(--white);border-radius:50%;width:18px;height:18px;font-size:10px;display:flex;align-items:center;justify-content:center}
+
+        /* MAIN NAV - GIỐNG ẢNH 2 */
+        .main-nav{
+            background:var(--primary);
+            color:var(--text);
+            font-weight:500;
+        }
+        .main-nav .container{
+            display:flex;
+            align-items:center;
+            gap:30px;
+            flex-wrap:wrap;
+        }
+        .nav-categories{
+            position:relative;
+            background:var(--primary-dark);
+            padding:12px 20px;
+            border-radius:4px;
+            cursor:pointer;
+            display:flex;
+            align-items:center;
+            gap:10px;
+            min-width:200px;
+        }
+        .nav-categories i{color:var(--text)}
+        .nav-categories:hover .nav-categories-menu{display:block}
+        .nav-categories-menu{
+            position:absolute;
+            top:100%;left:0;
+            width:250px;
+            background:var(--white);
+            box-shadow:0 5px 15px rgba(0,0,0,.1);
+            border-radius:4px;
+            display:none;
+            z-index:100;
+            overflow:hidden;
+        }
+        .nav-categories-menu a{
+            display:block;
+            padding:12px 15px;
+            color:#333;
+            border-bottom:1px solid var(--border);
+            transition:.2s;
+        }
+        .nav-categories-menu a:hover{background:var(--bg-light);color:var(--primary)}
+        .nav-links{
+            display:flex;
+            gap:25px;
+            flex:1;
+            flex-wrap:wrap;
+        }
+        .nav-links a{
+            color:var(--text);
+            text-decoration:none;
+            transition:.2s;
+        }
+        .nav-links a:hover{text-decoration:underline}
+
+        /* BANNER, CATEGORIES, PRODUCTS - GIỮ NGUYÊN */
+        .banner{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:var(--white);padding:60px 0;text-align:center}
+        .banner h1{font-size:36px;margin-bottom:15px}
+        .banner p{font-size:18px;margin-bottom:25px}
+        .section-title{font-size:24px;margin-bottom:25px;color:var(--primary);text-align:center}
+        .category-list,.product-list{display:grid;gap:20px}
+        .category-list{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+        .product-list{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+        .category-item,.product-card{background:var(--white);border-radius:8px;padding:20px;text-align:center;transition:.3s;cursor:pointer}
+        .category-item:hover,.product-card:hover{transform:translateY(-5px);box-shadow:0 5px 15px rgba(0,0,0,.1)}
+        .product-image{height:200px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;font-size:60px;color:var(--primary)}
+        .product-name{font-size:16px;font-weight:500;margin-bottom:10px;height:40px;overflow:hidden}
+        .product-price{display:flex;gap:10px;align-items:center;margin-bottom:15px}
+        .current-price{font-weight:bold;color:var(--primary);font-size:18px}
+        .original-price{color:#666;text-decoration:line-through;font-size:14px}
+        .discount-badge{background:var(--accent);color:var(--white);padding:3px 8px;border-radius:4px;font-size:12px}
+        .product-actions{display:flex;gap:10px}
+        .product-actions .btn{flex:1;padding:8px 10px;font-size:14px}
+
+        /* FOOTER - GIỐNG ẢNH 1 */
+        .footer{
+            background:var(--footer-bg);
+            color:var(--text);
+            padding:50px 0 20px;
+            margin-top:50px;
+        }
+        .footer-content{
+            display:grid;
+            grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+            gap:40px;
+            margin-bottom:30px;
+        }
+        .footer-section h3{
+            font-size:18px;
+            margin-bottom:20px;
+            padding-bottom:10px;
+            border-bottom:2px solid var(--primary);
+            display:inline-block;
+        }
+        .footer-section ul{list-style:none}
+        .footer-section ul li{margin-bottom:10px}
+        .footer-section ul li a{
+            color:#b0c4de;
+            text-decoration:none;
+            transition:.2s;
+        }
+        .footer-section ul li a:hover{color:var(--text);text-decoration:underline}
+        .contact-info i{
+            color:var(--primary);
+            margin-right:10px;
+            width:20px;
+        }
+        .social-links{
+            display:flex;
+            gap:12px;
+            margin-top:15px;
+        }
+        .social-links a{
+            width:36px;height:36px;
+            background:rgba(255,255,255,.1);
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            color:var(--text);
+            transition:.3s;
+        }
+        .social-links a:hover{background:var(--primary)}
+        .newsletter{
+            margin-top:15px;
+        }
+        .newsletter p{
+            margin-bottom:10px;
+            font-size:14px;
+            color:#b0c4de;
+        }
+        .newsletter-form{
+            display:flex;
+            gap:0;
+        }
+        .newsletter-form input{
+            flex:1;
+            padding:10px 15px;
+            border:none;
+            border-radius:4px 0 0 4px;
+            font-size:14px;
+        }
+        .newsletter-form button{
+            background:var(--primary);
+            color:var(--text);
+            border:none;
+            padding:0 15px;
+            border-radius:0 4px 4px 0;
+            cursor:pointer;
+        }
+        .footer-bottom{
+            text-align:center;
+            padding-top:20px;
+            border-top:1px solid rgba(255,255,255,.1);
+            font-size:14px;
+            color:#b0c4de;
+        }
+
+        @keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+        @media(max-width:992px){.main-header .container{flex-wrap:wrap}.search-box{order:3;max-width:100%;margin:10px 0 0}}
+        @media(max-width:768px){
+            .top-header-links{gap:15px;font-size:13px}
+            .nav-links{gap:15px;font-size:14px}
+            .main-nav .container{gap:15px}
+        }
+        @media(max-width:576px){
+            .top-header{padding:8px 0}
+            .top-header-links{gap:10px;font-size:12px;flex-wrap:wrap;justify-content:center}
+            .top-header .container{flex-direction:column;gap:8px}
+            .header-action-item span{display:none}
+            .nav-categories{font-size:14px;padding:10px 15px}
+            .nav-links{flex-wrap:wrap;justify-content:center}
+        }
+    </style>
+</head>
+<body>
+
+    <!-- TOP HEADER -->
+    <div class="top-header">
+        <div class="container">
+            <div class="top-header-links">
+                <a href="#">Hệ thống 50 cửa hàng</a>
+                <a href="#">Mua hàng: 1800.2097</a>
+                <a href="#">Tin công nghệ</a>
+            </div>
+            <div class="top-header-links">
+                <a href="#">Ưu đãi đối tác</a>
+                <a href="#">Tuyển dụng</a>
+                <a href="#">Kiểm tra đơn hàng</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN HEADER -->
+    <header class="main-header">
+        <div class="container">
+            <div class="logo"><a href="index.html">Blue<span>Phone</span></a></div>
+            <div class="search-box">
+                <input type="text" placeholder="Bạn tìm gì...">
+                <button><i class="fas fa-search"></i></button>
+            </div>
+            <div class="header-actions">
+                <div class="header-action-item" id="user-menu">
+                    <i class="fas fa-user"></i>
+                    <span id="user-name">Đăng nhập</span>
+                </div>
+                <div class="header-action-item"><i class="fas fa-heart"></i><span>Yêu thích</span></div>
+                <div class="header-action-item cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>Giỏ hàng</span>
+                    <span class="cart-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN NAV - GIỐNG ẢNH 2 -->
+    <nav class="main-nav">
+        <div class="container">
+            <div class="nav-categories">
+                <i class="fas fa-bars"></i>
+                <span>Danh mục sản phẩm</span>
+                <i class="fas fa-chevron-down" style="margin-left:auto"></i>
+                <div class="nav-categories-menu">
+                    <a href="#"><i class="fas fa-mobile-alt"></i> Điện thoại</a>
+                    <a href="#"><i class="fas fa-laptop"></i> Laptop</a>
+                    <a href="#"><i class="fas fa-headphones"></i> Phụ kiện</a>
+                    <a href="#"><i class="fas fa-clock"></i> Đồng hồ</a>
+                    <a href="#"><i class="fas fa-tv"></i> TV & Audio</a>
+                </div>
+            </div>
+            <div class="nav-links">
+                <a href="#">iPhone</a>
+                <a href="#">Samsung</a>
+                <a href="#">Xiaomi</a>
+                <a href="#">Oppo</a>
+                <a href="#">Realme</a>
+                <a href="#">Vivo</a>
+                <a href="#">Nokia</a>
+                <a href="#">Phụ kiện</a>
+                <a href="#">Dịch vụ</a>
+                <a href="#">Khuyến mãi</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- BANNER -->
+    <section class="banner">
+        <div class="container">
+            <h1>Điện thoại chính hãng giá tốt nhất</h1>
+            <p>Khám phá iPhone, Samsung, Xiaomi, Oppo...</p>
+            <a href="#" style="background:var(--accent);color:white;padding:12px 30px;border-radius:4px;display:inline-block;margin-top:15px;text-decoration:none;">Mua ngay</a>
+        </div>
+    </section>
+
+    <!-- CATEGORIES & PRODUCTS -->
+    <section class="categories">
+        <div class="container">
+            <h2 class="section-title">Danh mục sản phẩm</h2>
+            <div class="category-list">
+                <div class="category-item"><div style="font-size:50px;color:var(--primary)"><i class="fab fa-apple"></i></div><h3>iPhone</h3><p>Chính hãng VN/A</p></div>
+                <div class="category-item"><div style="font-size:50px;color:var(--primary)"><i class="fas fa-mobile-alt"></i></div><h3>Samsung</h3><p>Galaxy mới</p></div>
+                <div class="category-item"><div style="font-size:50px;color:var(--primary)"><i class="fas fa-mobile-alt"></i></div><h3>Xiaomi</h3><p>Giá tốt</p></div>
+                <div class="category-item"><div style="font-size:50px;color:var(--primary)"><i class="fas fa-mobile-alt"></i></div><h3>Oppo</h3><p>Camera đẹp</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="products">
+        <div class="container">
+            <h2 class="section-title">Sản phẩm nổi bật</h2>
+            <div class="product-list">
+                <div class="product-card">
+                    <div class="product-image"><i class="fab fa-apple"></i></div>
+                    <div style="padding:15px">
+                        <h3 class="product-name">iPhone 15 Pro Max</h3>
+                        <div class="product-price"><span class="current-price">28.990.000₫</span><span class="original-price">31.990.000₫</span><span class="discount-badge">-10%</span></div>
+                        <div class="product-actions"><button class="btn btn-primary" style="background:var(--primary);color:white;border:none;padding:8px;border-radius:4px">Mua ngay</button><button style="border:1px solid var(--primary);color:var(--primary);background:white;padding:8px;border-radius:4px">Chi tiết</button></div>
+                    </div>
+                </div>
+                <!-- Thêm 3 sản phẩm khác nếu cần -->
+            </div>
+        </div>
+    </section>
+
+    <!-- FOOTER - GIỐNG ẢNH 1 -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Về BluePhone</h3>
+                    <ul>
+                        <li><a href="#">Giới thiệu</a></li>
+                        <li><a href="#">Tuyển dụng</a></li>
+                        <li><a href="#">Chính sách bảo mật</a></li>
+                        <li><a href="#">Chính sách bán hàng</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h3>Chính sách</h3>
+                    <ul>
+                        <li><a href="#">Chính sách bảo hành</a></li>
+                        <li><a href="#">Chính sách đổi trả</a></li>
+                        <li><a href="#">Chính sách giao hàng</a></li>
+                        <li><a href="#">Chính sách trả góp</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section contact-info">
+                    <h3>Thông tin liên hệ</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 123 Nguyễn Văn Linh, Quận 7, TP.HCM</p>
+                    <p><i class="fas fa-phone"></i> 1800.2097</p>
+                    <p><i class="fas fa-envelope"></i> info@bluephone.vn</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-tiktok"></i></a>
+                    </div>
+                </div>
+                <div class="footer-section">
+                    <h3>Đăng ký nhận tin</h3>
+                    <p>Nhận thông tin sản phẩm mới và khuyến mãi</p>
+                    <div class="newsletter">
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Email của bạn">
+                            <button type="submit"><i class="fas fa-paper-plane"></i></button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>© 2023 BluePhone. Tất cả các quyền được bảo lưu.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const userNameSpan = document.getElementById('user-name');
+        const userMenu = document.getElementById('user-menu');
+        const cartCount = document.querySelector('.cart-count');
+        let count = 0;
+
+        window.addEventListener('load', () => {
+            const user = JSON.parse(sessionStorage.getItem('currentUser'));
+            if (user) {
+                userNameSpan.textContent = user.username;
+                userMenu.querySelector('i').className = 'fas fa-sign-out-alt';
+            }
+        });
+
+        userMenu.addEventListener('click', () => {
+            if (sessionStorage.getItem('currentUser')) {
+                if (confirm('Đăng xuất?')) {
+                    sessionStorage.removeItem('currentUser');
+                    userNameSpan.textContent = 'Đăng nhập';
+                    userMenu.querySelector('i').className = 'fas fa-user';
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        document.querySelectorAll('.btn-primary').forEach(btn => {
+            btn.addEventListener('click', () => {
+                count++;
+                cartCount.textContent = count;
+                const n = document.createElement('div');
+                n.textContent = 'Đã thêm vào giỏ!';
+                n.style.cssText = 'position:fixed;top:20px;right:20px;background:#34a853;color:white;padding:15px 20px;border-radius:4px;z-index:3000;animation:slideIn .3s';
+                document.body.appendChild(n);
+                setTimeout(() => n.remove(), 3000);
+            });
+        });
+    </script>
+</body>
+</html>
