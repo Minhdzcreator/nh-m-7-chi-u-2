@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý sản phẩm - BluePhone Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [CSS CHUNG] */
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        :root{--primary:#1a73e8;--danger:#d32f2f;--success:#34a853;--warning:#ff6d00;--bg:#f4f6f9}
+        body{background:var(--bg);color:#333}
+        .header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .header .logo{font-size:24px;font-weight:bold}
+        .header .user{display:flex;align-items:center;gap:10px}
+        .user span{font-weight:500}
+        .logout-btn{background:var(--danger);color:#fff;border:none;padding:8px 15px;border-radius:6px;cursor:pointer}
+        .logout-btn:hover{background:#b71c1c}
+        .sidebar{width:260px;background:#2c3e50;color:#fff;position:fixed;top:0;left:0;height:100%;padding-top:70px;overflow-y:auto}
+        .sidebar ul{list-style:none}
+        .sidebar a{display:block;padding:15px 20px;color:#ecf0f1;text-decoration:none;transition:.3s;border-left:4px solid transparent}
+        .sidebar a:hover{background:#34495e;border-left-color:var(--primary)}
+        .sidebar i{margin-right:10px;width:18px}
+        .main{margin-left:260px;padding:20px;min-height:100vh}
+        .page-title{display:flex;align-items:center;gap:10px;font-size:24px;margin-bottom:20px}
+        .add-section{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:20px}
+        .add-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+        .form-group{width:100%}
+        .form-group label{display:block;margin-bottom:5px;font-weight:500}
+        .form-group input,.form-group select,.form-group textarea{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+        .form-group textarea{height:80px}
+        .add-btn{background:var(--primary);color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:500}
+        .add-btn:hover{background:#0d47a1}
+        table{width:100%;border-collapse:collapse;margin-top:20px}
+        th,td{padding:12px;text-align:left;border-bottom:1px solid #eee}
+        th{background:#f8f9fa;font-weight:600}
+        .btn-small{padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin:0 2px}
+        .btn-edit{background:var(--primary);color:#fff}
+        .btn-toggle{background:var(--warning);color:#fff}
+        .btn-delete{background:var(--danger);color:#fff}
+        img{width:50px;height:50px;object-fit:cover;border-radius:4px}
+        @media(max-width:992px){.sidebar{display:none}.main{margin-left:0}.add-form{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Blue<span style="color:#34a853">Phone</span> Admin</div>
+        <div class="user">
+            <i class="fas fa-user-circle" style="font-size:24px"></i>
+            <span id="adminName">Admin</span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i>Tổng quan</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Khách hàng</a></li>
+            <li><a href="categories.html"><i class="fas fa-tags"></i>Loại SP</a></li>
+            <li><a href="products.html" class="active"><i class="fas fa-mobile-alt"></i>Sản phẩm</a></li>
+            <li><a href="imports.html"><i class="fas fa-truck-loading"></i>Nhập hàng</a></li>
+            <li><a href="pricing.html"><i class="fas fa-dollar-sign"></i>Giá bán</a></li>
+            <li><a href="orders.html"><i class="fas fa-shopping-cart"></i>Đơn hàng</a></li>
+            <li><a href="inventory.html"><i class="fas fa-boxes"></i>Tồn kho</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <div class="page-title">
+            <i class="fas fa-mobile-alt"></i>
+            <h1>Quản lý sản phẩm</h1>
+        </div>
+
+        <div class="add-section">
+            <h3>Thêm sản phẩm mới</h3>
+            <form id="addProductForm" class="add-form">
+                <div class="form-group">
+                    <label>Mã sản phẩm</label>
+                    <input type="text" id="productCode" placeholder="VD: IPH15PM" required>
+                </div>
+                <div class="form-group">
+                    <label>Tên sản phẩm</label>
+                    <input type="text" id="productName" placeholder="iPhone 15 Pro Max 256GB" required>
+                </div>
+                <div class="form-group">
+                    <label>Loại sản phẩm</label>
+                    <select id="productCategory" required>
+                        <option value="">Chọn loại</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Hình ảnh URL</label>
+                    <input type="url" id="productImage" placeholder="https://example.com/image.jpg">
+                </div>
+                <div class="form-group">
+                    <label>Mô tả</label>
+                    <textarea id="productDescription" placeholder="Mô tả chi tiết sản phẩm..."></textarea>
+                </div>
+                <button type="submit" class="add-btn">Thêm sản phẩm</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã</th>
+                    <th>Tên</th>
+                    <th>Loại</th>
+                    <th>Hình</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="productList">
+                <tr><td colspan="6">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script src="../assets/js/admin.js"></script>
+    <script>
+        checkAdminLogin();
+        document.getElementById('adminName').textContent = JSON.parse(localStorage.getItem('currentAdmin')).username;
+
+        // Load loại sản phẩm cho select
+        function loadCategories() {
+            const categories = getData('categories');
+            const select = document.getElementById('productCategory');
+            select.innerHTML = '<option value="">Chọn loại</option>' + categories.map(cat => 
+                `<option value="${cat.id}">${cat.name}</option>`
+            ).join('');
+        }
+
+        // Render danh sách sản phẩm
+        function renderProducts() {
+            const products = getData('products');
+            const categories = getData('categories');
+            const tbody = document.getElementById('productList');
+            if (products.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:40px">Chưa có sản phẩm nào</td></tr>';
+                return;
+            }
+            tbody.innerHTML = products.map(product => {
+                const cat = categories.find(c => c.id === product.categoryId);
+                return `
+                    <tr>
+                        <td>${product.code}</td>
+                        <td>${product.name}</td>
+                        <td>${cat ? cat.name : 'N/A'}</td>
+                        <td><img src="${product.image || 'https://via.placeholder.com/50'}" alt="${product.name}"></td>
+                        <td>${product.hidden ? 'Ẩn' : 'Hiển thị'}</td>
+                        <td>
+                            <button class="btn-small btn-edit" onclick="editProduct('${product.id}')">Sửa</button>
+                            <button class="btn-small btn-toggle" onclick="toggleProduct('${product.id}')">${product.hidden ? 'Hiện' : 'Ẩn'}</button>
+                            <button class="btn-small btn-delete" onclick="deleteProduct('${product.id}')">Xóa</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Thêm sản phẩm
+        document.getElementById('addProductForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const product = {
+                id: Date.now().toString(),
+                code: document.getElementById('productCode').value.trim(),
+                name: document.getElementById('productName').value.trim(),
+                categoryId: document.getElementById('productCategory').value,
+                image: document.getElementById('productImage').value.trim() || 'https://via.placeholder.com/300x300?text=Product',
+                description: document.getElementById('productDescription').value.trim(),
+                hidden: false,
+                createdAt: new Date().toISOString(),
+                stock: 0
+            };
+            if (product.code && product.name && product.categoryId) {
+                const products = getData('products');
+                products.push(product);
+                saveData('products', products);
+                e.target.reset();
+                alert('Thêm sản phẩm thành công!');
+                renderProducts();
+            } else {
+                alert('Vui lòng điền đầy đủ thông tin!');
+            }
+        });
+
+        // Sửa sản phẩm
+        window.editProduct = (id) => {
+            const products = getData('products');
+            const product = products.find(p => p.id === id);
+            if (product) {
+                const newName = prompt('Tên mới:', product.name);
+                const newCode = prompt('Mã mới:', product.code);
+                const newDescription = prompt('Mô tả mới:', product.description);
+                if (newName) product.name = newName;
+                if (newCode) product.code = newCode;
+                if (newDescription) product.description = newDescription;
+                saveData('products', products);
+                alert('Cập nhật thành công!');
+                renderProducts();
+            }
+        };
+
+        // Ẩn/Hiện sản phẩm
+        window.toggleProduct = (id) => {
+            const products = getData('products');
+            const product = products.find(p => p.id === id);
+            product.hidden = !product.hidden;
+            saveData('products', products);
+            alert(product.hidden ? 'Đã ẩn sản phẩm' : 'Đã hiện sản phẩm');
+            renderProducts();
+        };
+
+        // Xóa sản phẩm
+        window.deleteProduct = (id) => {
+            if (confirm('Xóa sản phẩm này?')) {
+                let products = getData('products');
+                products = products.filter(p => p.id !== id);
+                saveData('products', products);
+                alert('Xóa thành công!');
+                renderProducts();
+            }
+        };
+
+        // Load ban đầu
+        loadCategories();
+        renderProducts();
+    </script>
+</body>
+</html>

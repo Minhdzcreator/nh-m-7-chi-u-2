@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý nhập hàng - BluePhone Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [CSS CHUNG] */
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        :root{--primary:#1a73e8;--danger:#d32f2f;--success:#34a853;--warning:#ff6d00;--bg:#f4f6f9}
+        body{background:var(--bg);color:#333}
+        .header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .header .logo{font-size:24px;font-weight:bold}
+        .header .user{display:flex;align-items:center;gap:10px}
+        .user span{font-weight:500}
+        .logout-btn{background:var(--danger);color:#fff;border:none;padding:8px 15px;border-radius:6px;cursor:pointer}
+        .logout-btn:hover{background:#b71c1c}
+        .sidebar{width:260px;background:#2c3e50;color:#fff;position:fixed;top:0;left:0;height:100%;padding-top:70px;overflow-y:auto}
+        .sidebar ul{list-style:none}
+        .sidebar a{display:block;padding:15px 20px;color:#ecf0f1;text-decoration:none;transition:.3s;border-left:4px solid transparent}
+        .sidebar a:hover{background:#34495e;border-left-color:var(--primary)}
+        .sidebar i{margin-right:10px;width:18px}
+        .main{margin-left:260px;padding:20px;min-height:100vh}
+        .page-title{display:flex;align-items:center;gap:10px;font-size:24px;margin-bottom:20px}
+        .add-section{background:#fff;padding:20px;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.05);margin-bottom:20px}
+        .add-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px}
+        .form-group{width:100%}
+        .form-group label{display:block;margin-bottom:5px;font-weight:500}
+        .form-group input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+        .items-section{margin-top:20px}
+        .item-row{display:flex;gap:10px;margin-bottom:10px;align-items:center}
+        .item-row input{flex:1}
+        .add-item-btn{background:var(--success);color:#fff;border:none;padding:5px 10px;border-radius:4px;cursor:pointer}
+        .complete-btn{background:var(--success);color:#fff;border:none;padding:10px 20px;border-radius:4px;cursor:pointer;font-weight:500}
+        table{width:100%;border-collapse:collapse;margin-top:20px}
+        th,td{padding:12px;text-align:left;border-bottom:1px solid #eee}
+        th{background:#f8f9fa;font-weight:600}
+        .status-badge{padding:4px 8px;border-radius:4px;font-size:12px}
+        .status-pending{background:var(--warning);color:#fff}
+        .status-completed{background:var(--success);color:#fff}
+        .btn-small{padding:4px 8px;border:none;border-radius:4px;cursor:pointer;font-size:12px;margin:0 2px}
+        .btn-edit{background:var(--primary);color:#fff}
+        .btn-complete{background:var(--success);color:#fff}
+        .btn-delete{background:var(--danger);color:#fff}
+        @media(max-width:992px){.sidebar{display:none}.main{margin-left:0}.add-form{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Blue<span style="color:#34a853">Phone</span> Admin</div>
+        <div class="user">
+            <i class="fas fa-user-circle" style="font-size:24px"></i>
+            <span id="adminName">Admin</span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i>Tổng quan</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Khách hàng</a></li>
+            <li><a href="categories.html"><i class="fas fa-tags"></i>Loại SP</a></li>
+            <li><a href="products.html"><i class="fas fa-mobile-alt"></i>Sản phẩm</a></li>
+            <li><a href="imports.html" class="active"><i class="fas fa-truck-loading"></i>Nhập hàng</a></li>
+            <li><a href="pricing.html"><i class="fas fa-dollar-sign"></i>Giá bán</a></li>
+            <li><a href="orders.html"><i class="fas fa-shopping-cart"></i>Đơn hàng</a></li>
+            <li><a href="inventory.html"><i class="fas fa-boxes"></i>Tồn kho</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <div class="page-title">
+            <i class="fas fa-truck-loading"></i>
+            <h1>Quản lý nhập hàng</h1>
+        </div>
+
+        <div class="add-section">
+            <h3>Thêm phiếu nhập mới</h3>
+            <form id="addImportForm" class="add-form">
+                <div class="form-group">
+                    <label>Mã phiếu nhập</label>
+                    <input type="text" id="importCode" placeholder="VD: NH001" required>
+                </div>
+                <div class="form-group">
+                    <label>Ngày nhập</label>
+                    <input type="date" id="importDate" required>
+                </div>
+                <div class="form-group">
+                    <label>Ghi chú</label>
+                    <input type="text" id="importNote" placeholder="Ghi chú phiếu nhập">
+                </div>
+                <div class="items-section">
+                    <h4>Sản phẩm trong phiếu</h4>
+                    <div id="itemRows">
+                        <div class="item-row">
+                            <select class="product-select" required>
+                                <option value="">Chọn sản phẩm</option>
+                            </select>
+                            <input type="number" placeholder="Số lượng" min="1" required>
+                            <input type="number" placeholder="Giá nhập (₫)" min="0" step="1000" required>
+                            <button type="button" class="add-item-btn" onclick="removeItem(this)">Xóa</button>
+                        </div>
+                    </div>
+                    <button type="button" onclick="addItemRow()" class="add-item-btn" style="background:var(--primary);color:#fff;margin-top:10px">Thêm sản phẩm</button>
+                </div>
+                <button type="submit" class="complete-btn" style="margin-top:20px">Lưu phiếu nhập</button>
+            </form>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã phiếu</th>
+                    <th>Ngày nhập</th>
+                    <th>Trạng thái</th>
+                    <th>Số SP</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody id="importList">
+                <tr><td colspan="5">Đang tải...</td></tr>
+            </tbody>
+        </table>
+    </main>
+
+    <script src="../assets/js/admin.js"></script>
+    <script>
+        checkAdminLogin();
+        document.getElementById('adminName').textContent = JSON.parse(localStorage.getItem('currentAdmin')).username;
+
+        // Load sản phẩm cho select
+        function loadProducts() {
+            const products = getData('products');
+            const selects = document.querySelectorAll('.product-select');
+            selects.forEach(select => {
+                select.innerHTML = '<option value="">Chọn sản phẩm</option>' + products.map(p => 
+                    `<option value="${p.id}" data-price="${p.cost || 0}">${p.name} (${p.code})</option>`
+                ).join('');
+            });
+        }
+
+        // Thêm hàng sản phẩm
+        window.addItemRow = () => {
+            const container = document.getElementById('itemRows');
+            const row = document.createElement('div');
+            row.className = 'item-row';
+            row.innerHTML = `
+                <select class="product-select" required>
+                    <option value="">Chọn sản phẩm</option>
+                </select>
+                <input type="number" placeholder="Số lượng" min="1" required>
+                <input type="number" placeholder="Giá nhập (₫)" min="0" step="1000" required>
+                <button type="button" class="add-item-btn" onclick="removeItem(this)">Xóa</button>
+            `;
+            container.appendChild(row);
+            loadProducts();
+        };
+
+        // Xóa hàng
+        window.removeItem = (btn) => btn.parentElement.remove();
+
+        // Render danh sách phiếu nhập
+        function renderImports() {
+            const imports = getData('imports');
+            const tbody = document.getElementById('importList');
+            tbody.innerHTML = imports.map(imp => `
+                <tr>
+                    <td>${imp.code}</td>
+                    <td>${new Date(imp.date).toLocaleDateString('vi-VN')}</td>
+                    <td><span class="status-badge status-${imp.status}">${imp.status === 'completed' ? 'Hoàn thành' : 'Chờ xử lý'}</span></td>
+                    <td>${imp.items.length}</td>
+                    <td>
+                        <button class="btn-small btn-edit" onclick="editImport('${imp.id}')">Sửa</button>
+                        ${imp.status !== 'completed' ? `<button class="btn-small btn-complete" onclick="completeImport('${imp.id}')">Hoàn thành</button>` : ''}
+                        <button class="btn-small btn-delete" onclick="deleteImport('${imp.id}')">Xóa</button>
+                    </td>
+                </tr>
+            `).join('') || '<tr><td colspan="5" style="text-align:center;padding:40px">Chưa có phiếu nhập nào</td></tr>';
+        }
+
+        // Thêm phiếu nhập
+        document.getElementById('addImportForm').addEventListener('submit', e => {
+            e.preventDefault();
+            const code = document.getElementById('importCode').value.trim();
+            const date = document.getElementById('importDate').value;
+            const note = document.getElementById('importNote').value.trim();
+            const itemRows = document.querySelectorAll('.item-row');
+
+            const items = Array.from(itemRows).map(row => {
+                const select = row.querySelector('.product-select');
+                const qty = row.querySelector('input[type="number"]:nth-of-type(1)');
+                const price = row.querySelector('input[type="number"]:nth-of-type(2)');
+                return {
+                    productId: select.value,
+                    quantity: parseInt(qty.value),
+                    price: parseFloat(price.value)
+                };
+            }).filter(item => item.productId && item.quantity > 0 && item.price > 0);
+
+            if (code && date && items.length > 0) {
+                const importItem = {
+                    id: Date.now().toString(),
+                    code: code,
+                    date: date,
+                    note: note,
+                    items: items,
+                    status: 'pending',
+                    createdAt: new Date().toISOString()
+                };
+                const imports = getData('imports');
+                imports.push(importItem);
+                saveData('imports', imports);
+                e.target.reset();
+                document.getElementById('itemRows').innerHTML = `
+                    <div class="item-row">
+                        <select class="product-select" required><option value="">Chọn sản phẩm</option></select>
+                        <input type="number" placeholder="Số lượng" min="1" required>
+                        <input type="number" placeholder="Giá nhập (₫)" min="0" step="1000" required>
+                        <button type="button" class="add-item-btn" onclick="removeItem(this)">Xóa</button>
+                    </div>
+                `;
+                loadProducts();
+                alert('Thêm phiếu nhập thành công!');
+                renderImports();
+            } else {
+                alert('Vui lòng điền đầy đủ thông tin!');
+            }
+        });
+
+        // Hoàn thành phiếu nhập
+        window.completeImport = (id) => {
+            if (confirm('Hoàn thành phiếu nhập này? (Không thể sửa sau khi hoàn thành)')) {
+                const imports = getData('imports');
+                const imp = imports.find(i => i.id === id);
+                imp.status = 'completed';
+                saveData('imports', imports);
+                // Cập nhật tồn kho
+                updateStock(imp.items, 'add');
+                alert('Phiếu nhập đã hoàn thành!');
+                renderImports();
+            }
+        };
+
+        // Cập nhật tồn kho
+        function updateStock(items, action) {
+            let products = getData('products');
+            let inventory = getData('inventory') || [];
+            items.forEach(item => {
+                const product = products.find(p => p.id === item.productId);
+                if (product) {
+                    const delta = action === 'add' ? item.quantity : -item.quantity;
+                    product.stock = (product.stock || 0) + delta;
+                    saveData('products', products);
+                }
+            });
+        }
+
+        // Load ban đầu
+        document.getElementById('importDate').valueAsDate = new Date();
+        addItemRow();
+        loadProducts();
+        renderImports();
+    </script>
+</body>
+</html>

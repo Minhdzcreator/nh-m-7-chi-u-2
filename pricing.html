@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý giá bán - BluePhone Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* [CSS CHUNG] */
+        *{margin:0;padding:0;box-sizing:border-box;font-family:'Segoe UI',sans-serif}
+        :root{--primary:#1a73e8;--danger:#d32f2f;--success:#34a853;--warning:#ff6d00;--bg:#f4f6f9}
+        body{background:var(--bg);color:#333}
+        .header{background:var(--primary);color:#fff;padding:15px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+        .header .logo{font-size:24px;font-weight:bold}
+        .header .user{display:flex;align-items:center;gap:10px}
+        .user span{font-weight:500}
+        .logout-btn{background:var(--danger);color:#fff;border:none;padding:8px 15px;border-radius:6px;cursor:pointer}
+        .logout-btn:hover{background:#b71c1c}
+        .sidebar{width:260px;background:#2c3e50;color:#fff;position:fixed;top:0;left:0;height:100%;padding-top:70px;overflow-y:auto}
+        .sidebar ul{list-style:none}
+        .sidebar a{display:block;padding:15px 20px;color:#ecf0f1;text-decoration:none;transition:.3s;border-left:4px solid transparent}
+        .sidebar a:hover{background:#34495e;border-left-color:var(--primary)}
+        .sidebar i{margin-right:10px;width:18px}
+        .main{margin-left:260px;padding:20px;min-height:100vh}
+        .page-title{display:flex;align-items:center;gap:10px;font-size:24px;margin-bottom:20px}
+        .tabs{display:flex;gap:5px;margin-bottom:20px}
+        .tab-btn{padding:10px 20px;background:#f8f9fa;border:1px solid #ddd;border-radius:4px 4px 0 0;cursor:pointer;transition:.3s}
+        .tab-btn.active{background:var(--primary);color:#fff}
+        .tab-content{display:none;background:#fff;padding:20px;border-radius:0 0 8px 8px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+        .tab-content.active{display:block}
+        .form-group{margin-bottom:15px}
+        .form-group label{display:block;margin-bottom:5px;font-weight:500}
+        .form-group input{width:100%;padding:8px;border:1px solid #ddd;border-radius:4px}
+        .save-btn{background:var(--primary);color:#fff;border:none;padding:8px 16px;border-radius:4px;cursor:pointer}
+        table{width:100%;border-collapse:collapse;margin-top:20px}
+        th,td{padding:12px;text-align:left;border-bottom:1px solid #eee}
+        th{background:#f8f9fa;font-weight:600}
+        .profit-rate{text-align:center;font-weight:600;color:var(--success)}
+        @media(max-width:992px){.sidebar{display:none}.main{margin-left:0}.tabs{flex-wrap:wrap}}
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Blue<span style="color:#34a853">Phone</span> Admin</div>
+        <div class="user">
+            <i class="fas fa-user-circle" style="font-size:24px"></i>
+            <span id="adminName">Admin</span>
+            <button class="logout-btn" onclick="logout()">Đăng xuất</button>
+        </div>
+    </div>
+
+    <nav class="sidebar">
+        <ul>
+            <li><a href="dashboard.html"><i class="fas fa-tachometer-alt"></i>Tổng quan</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i>Khách hàng</a></li>
+            <li><a href="categories.html"><i class="fas fa-tags"></i>Loại SP</a></li>
+            <li><a href="products.html"><i class="fas fa-mobile-alt"></i>Sản phẩm</a></li>
+            <li><a href="imports.html"><i class="fas fa-truck-loading"></i>Nhập hàng</a></li>
+            <li><a href="pricing.html" class="active"><i class="fas fa-dollar-sign"></i>Giá bán</a></li>
+            <li><a href="orders.html"><i class="fas fa-shopping-cart"></i>Đơn hàng</a></li>
+            <li><a href="inventory.html"><i class="fas fa-boxes"></i>Tồn kho</a></li>
+        </ul>
+    </nav>
+
+    <main class="main">
+        <div class="page-title">
+            <i class="fas fa-dollar-sign"></i>
+            <h1>Quản lý giá bán</h1>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="showTab('category-pricing')">Theo loại</button>
+            <button class="tab-btn" onclick="showTab('product-pricing')">Theo sản phẩm</button>
+        </div>
+
+        <div id="category-pricing" class="tab-content active">
+            <div class="form-group">
+                <label>Tỉ lệ lợi nhuận mặc định (%)</label>
+                <input type="number" id="defaultProfitRate" min="0" max="100" step="0.1">
+                <button class="save-btn" onclick="saveDefaultRate()">Lưu mặc định</button>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Loại sản phẩm</th>
+                        <th>Tỉ lệ lợi nhuận (%)</th>
+                        <th>Giá vốn trung bình</th>
+                        <th>Giá bán trung bình</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryRateList">
+                    <tr><td colspan="5">Đang tải...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="product-pricing" class="tab-content">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Sản phẩm</th>
+                        <th>Giá vốn</th>
+                        <th>Lợi nhuận (%)</th>
+                        <th>Giá bán</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody id="productRateList">
+                    <tr><td colspan="5">Đang tải...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script src="../assets/js/admin.js"></script>
+    <script>
+        checkAdminLogin();
+        document.getElementById('adminName').textContent = JSON.parse(localStorage.getItem('currentAdmin')).username;
+
+        // Tab switching
+        window.showTab = (tabId) => {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            if (tabId === 'category-pricing') renderCategoryRates();
+            else renderProductRates();
+        };
+
+        // Render theo loại
+        function renderCategoryRates() {
+            const categories = getData('categories');
+            const profitRates = getData('profitRates') || [];
+            const tbody = document.getElementById('categoryRateList');
+            tbody.innerHTML = categories.map(cat => {
+                const rate = profitRates.find(r => r.categoryId === cat.id) || { rate: 20 };
+                return `
+                    <tr>
+                        <td>${cat.name}</td>
+                        <td>
+                            <input type="number" value="${rate.rate}" min="0" max="100" step="0.1" onchange="updateCategoryRate('${cat.id}', this.value)">
+                        </td>
+                        <td>${calculateAvgCost(cat.id).toLocaleString()}₫</td>
+                        <td>${calculateAvgSale(cat.id).toLocaleString()}₫</td>
+                        <td><button class="save-btn" onclick="saveCategoryRate('${cat.id}')">Lưu</button></td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5">Chưa có loại sản phẩm</td></tr>';
+        }
+
+        // Render theo sản phẩm
+        function renderProductRates() {
+            const products = getData('products');
+            const profitRates = getData('profitRates') || [];
+            const tbody = document.getElementById('productRateList');
+            tbody.innerHTML = products.map(product => {
+                const rate = profitRates.find(r => r.productId === product.id) || { rate: 20 };
+                const salePrice = product.cost ? (product.cost * (1 + rate.rate / 100)).toFixed(0) : 0;
+                return `
+                    <tr>
+                        <td>${product.name}</td>
+                        <td>${product.cost ? product.cost.toLocaleString() + '₫' : 'N/A'}</td>
+                        <td>
+                            <input type="number" value="${rate.rate}" min="0" max="100" step="0.1" onchange="updateProductRate('${product.id}', this.value)">
+                        </td>
+                        <td>${salePrice.toLocaleString()}₫</td>
+                        <td><button class="save-btn" onclick="saveProductRate('${product.id}')">Lưu</button></td>
+                    </tr>
+                `;
+            }).join('') || '<tr><td colspan="5">Chưa có sản phẩm</td></tr>';
+        }
+
+        // Tính giá vốn trung bình
+        function calculateAvgCost(categoryId) {
+            const products = getData('products').filter(p => p.categoryId === categoryId);
+            const totalCost = products.reduce((sum, p) => sum + (p.cost || 0), 0);
+            return products.length ? totalCost / products.length : 0;
+        }
+
+        // Tính giá bán trung bình
+        function calculateAvgSale(categoryId) {
+            const products = getData('products').filter(p => p.categoryId === categoryId);
+            const profitRates = getData('profitRates') || [];
+            let totalSale = 0;
+            products.forEach(p => {
+                const rate = profitRates.find(r => r.productId === p.id) || { rate: 20 };
+                totalSale += p.cost ? p.cost * (1 + rate.rate / 100) : 0;
+            });
+            return products.length ? totalSale / products.length : 0;
+        }
+
+        // Cập nhật tỉ lệ theo loại
+        window.updateCategoryRate = (categoryId, rate) => {
+            let profitRates = getData('profitRates') || [];
+            const existing = profitRates.find(r => r.categoryId === categoryId && !r.productId);
+            if (existing) existing.rate = parseFloat(rate);
+            else profitRates.push({ categoryId, rate: parseFloat(rate), type: 'category' });
+            saveData('profitRates', profitRates);
+        };
+
+        // Cập nhật tỉ lệ theo sản phẩm
+        window.updateProductRate = (productId, rate) => {
+            let profitRates = getData('profitRates') || [];
+            const existing = profitRates.find(r => r.productId === productId);
+            if (existing) existing.rate = parseFloat(rate);
+            else profitRates.push({ productId, rate: parseFloat(rate), type: 'product' });
+            saveData('profitRates', profitRates);
+        };
+
+        // Lưu mặc định
+        window.saveDefaultRate = () => {
+            const rate = parseFloat(document.getElementById('defaultProfitRate').value);
+            if (rate) {
+                localStorage.setItem('defaultProfitRate', rate);
+                alert('Lưu thành công!');
+            }
+        };
+
+        // Load ban đầu
+        renderCategoryRates();
+    </script>
+</body>
+</html>
